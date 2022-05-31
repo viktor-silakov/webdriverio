@@ -1,8 +1,8 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`getCapabilities should return driver with capabilities for android 1`] = `
-Object {
-  "capabilities": Object {
+exports[`getCapabilities > should return driver with capabilities for android 1`] = `
+{
+  "capabilities": {
     "app": "foo.apk",
     "automationName": "UiAutomator2",
     "deviceName": "Test",
@@ -13,9 +13,9 @@ Object {
 }
 `;
 
-exports[`getCapabilities should return driver with capabilities for android 2`] = `
-Object {
-  "capabilities": Object {
+exports[`getCapabilities > should return driver with capabilities for android 2`] = `
+{
+  "capabilities": {
     "automationName": "UiAutomator2",
     "browserName": "Chrome",
     "deviceName": "Test",
@@ -26,17 +26,17 @@ Object {
 }
 `;
 
-exports[`getCapabilities should return driver with capabilities for desktop 1`] = `
-Object {
-  "capabilities": Object {
+exports[`getCapabilities > should return driver with capabilities for desktop 1`] = `
+{
+  "capabilities": {
     "browserName": "chrome",
   },
 }
 `;
 
-exports[`getCapabilities should return driver with capabilities for ios 1`] = `
-Object {
-  "capabilities": Object {
+exports[`getCapabilities > should return driver with capabilities for ios 1`] = `
+{
+  "capabilities": {
     "app": "foo.app",
     "automationName": "XCUITest",
     "deviceName": "fooName",
@@ -47,9 +47,9 @@ Object {
 }
 `;
 
-exports[`getCapabilities should return driver with capabilities for ios 2`] = `
-Object {
-  "capabilities": Object {
+exports[`getCapabilities > should return driver with capabilities for ios 2`] = `
+{
+  "capabilities": {
     "automationName": "XCUITest",
     "browserName": "Safari",
     "deviceName": "iPhone Simulator",
