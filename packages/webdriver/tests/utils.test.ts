@@ -1,13 +1,21 @@
-import { URL } from 'url'
-import { Capabilities, Options } from '@wdio/types'
+import path from 'node:path'
+import { URL } from 'node:url'
+import type { MockedFunction } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { transformCommandLogResult } from '@wdio/utils'
+import type { Capabilities, Options } from '@wdio/types'
+
 import {
     isSuccessfulResponse, getPrototype, getSessionError,
     getErrorFromResponseBody, CustomRequestError, startWebDriverSession,
     getTimeoutError,
     setupDirectConnect
-} from '../src/utils'
-import type { Client } from '../src/types'
+} from '../src/utils.js'
+import type { Client } from '../src/types.js'
+
+vi.mock('@wdio/logger', () => import(path.join(process.cwd(), '__mocks__', '@wdio/logger')))
+vi.mock('@wdio/utils')
+vi.mock('got')
 
 describe('utils', () => {
     it('isSuccessfulResponse', () => {
@@ -176,25 +184,28 @@ describe('utils', () => {
 
     describe('setupDirectConnect', () => {
         class TestClient implements Client {
-            sessionId: string
-            capabilities: Capabilities.DesiredCapabilities | Capabilities.W3CCapabilities
-            requestedCapabilities: Capabilities.DesiredCapabilities | Capabilities.W3CCapabilities
-            options: Options.WebDriver
+            // @ts-expect-error
+            sessionId?: string
+            // @ts-expect-error
+            requestedCapabilities?: Capabilities.DesiredCapabilities | Capabilities.W3CCapabilities
 
-            constructor(capabilities, options) {
+            constructor(
+                public capabilities: Capabilities.DesiredCapabilities | Capabilities.W3CCapabilities,
+                public options: Options.WebDriver
+            ) {
                 this.capabilities = capabilities
                 this.options = options
             }
         }
 
         it('should do nothing if params contain no direct connect caps', function () {
-            const client = new TestClient({ platformName: 'baz' }, { hostname: 'bar' }) as Client
+            const client = new TestClient({ platformName: 'baz' }, { hostname: 'bar' } as any) as Client
             setupDirectConnect(client)
             expect(client.options.hostname).toEqual('bar')
         })
 
         it('should do nothing if params contain incomplete direct connect caps', function () {
-            const client = new TestClient({ platformName: 'baz', directConnectHost: 'baz' }, { hostname: 'bar' }) as Client
+            const client = new TestClient({ platformName: 'baz', directConnectHost: 'baz' }, { hostname: 'bar' } as any) as Client
             setupDirectConnect(client)
             expect(client.options.hostname).toEqual('bar')
         })
@@ -211,7 +222,7 @@ describe('utils', () => {
                 hostname: 'foo',
                 port: 1234,
                 path: ''
-            }) as Client
+            } as any) as Client
             setupDirectConnect(client)
             expect(client.options.protocol).toBe('https')
             expect(client.options.hostname).toBe('bar')
@@ -231,7 +242,7 @@ describe('utils', () => {
                 hostname: 'foo',
                 port: 1234,
                 path: ''
-            }) as Client
+            } as any) as Client
             setupDirectConnect(client)
             expect(client.options.protocol).toBe('https')
             expect(client.options.hostname).toBe('bar')
@@ -328,7 +339,7 @@ describe('utils', () => {
         })
 
         it('should handle sessionRequest error', async () => {
-            let error = await startWebDriverSession({
+            const error = await startWebDriverSession({
                 logLevel: 'warn',
                 capabilities: {}
             }).catch((err) => err)
@@ -409,7 +420,7 @@ describe('utils', () => {
             })
 
             it('command args with base64 script', async () => {
-                (transformCommandLogResult as jest.Mock).mockReturnValueOnce('"<Script[base64]>"')
+                (transformCommandLogResult as MockedFunction<any>).mockReturnValueOnce('"<Script[base64]>"')
 
                 const err = new Error('Timeout')
                 const cmdArgs = { script: Buffer.from('script').toString('base64') }
@@ -435,7 +446,7 @@ describe('utils', () => {
             })
 
             it('command args with base64 screenshot', async () => {
-                (transformCommandLogResult as jest.Mock).mockReturnValueOnce('"<Screenshot[base64]>"')
+                (transformCommandLogResult as MockedFunction<any>).mockReturnValueOnce('"<Screenshot[base64]>"')
 
                 const err = new Error('Timeout')
                 const cmdArgs = { file: Buffer.from('screen').toString('base64') }

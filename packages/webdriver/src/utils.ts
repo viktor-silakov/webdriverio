@@ -1,21 +1,23 @@
-import merge from 'lodash.merge'
+import { deepmergeCustom } from 'deepmerge-ts'
+
 import logger from '@wdio/logger'
+import type { Protocol } from '@wdio/protocols'
 import {
     WebDriverProtocol, MJsonWProtocol, JsonWProtocol, AppiumProtocol, ChromiumProtocol,
-    SauceLabsProtocol, SeleniumProtocol, GeckoProtocol
+    SauceLabsProtocol, SeleniumProtocol, GeckoProtocol, WebDriverBidiProtocol
 } from '@wdio/protocols'
-import Protocols from '@wdio/protocols'
-import { Options, Capabilities } from '@wdio/types'
-
-import RequestFactory from './request/factory'
-import { WebDriverResponse } from './request'
-import command from './command'
 import { transformCommandLogResult } from '@wdio/utils'
 import { CAPABILITY_KEYS } from '@wdio/protocols'
-import { REG_EXPS } from './constants'
-import type { Client, JSONWPCommandError, SessionFlags } from './types'
+import type { Options, Capabilities } from '@wdio/types'
+
+import RequestFactory from './request/factory.js'
+import command from './command.js'
+import { REG_EXPS } from './constants.js'
+import type { WebDriverResponse } from './request/index.js'
+import type { Client, JSONWPCommandError, SessionFlags } from './types.js'
 
 const log = logger('webdriver')
+const deepmerge = deepmergeCustom({ mergeArrays: false })
 
 const BROWSER_DRIVER_ERRORS = [
     'unknown command: wd/hub/session', // chromedriver
@@ -69,7 +71,7 @@ export async function startWebDriverSession (params: Options.WebDriver): Promise
          */
         : [{ alwaysMatch: params.capabilities, firstMatch: [{}] }, params.capabilities]
 
-    const sessionRequest = RequestFactory.getInstance(
+    const sessionRequest = await RequestFactory.getInstance(
         'POST',
         '/session',
         {
@@ -169,19 +171,23 @@ export function isSuccessfulResponse (statusCode?: number, body?: WebDriverRespo
  */
 export function getPrototype ({ isW3C, isChrome, isFirefox, isMobile, isSauce, isSeleniumStandalone }: Partial<SessionFlags>) {
     const prototype: Record<string, PropertyDescriptor> = {}
-    const ProtocolCommands: Protocols.Protocol = merge(
+    const ProtocolCommands: Protocol = deepmerge(
         /**
          * if mobile apply JSONWire and WebDriver protocol because
          * some legacy JSONWire commands are still used in Appium
          * (e.g. set/get geolocation)
          */
         isMobile
-            ? merge({}, JsonWProtocol, WebDriverProtocol)
+            ? deepmerge(JsonWProtocol, WebDriverProtocol)
             : isW3C ? WebDriverProtocol : JsonWProtocol,
+        /**
+         * enable Bidi protocol for W3C sessions
+         */
+        isW3C ? WebDriverBidiProtocol : {},
         /**
          * only apply mobile protocol if session is actually for mobile
          */
-        isMobile ? merge({}, MJsonWProtocol, AppiumProtocol) : {},
+        isMobile ? deepmerge(MJsonWProtocol, AppiumProtocol) : {},
         /**
          * only apply special Chrome commands if session is using Chrome
          */
@@ -198,7 +204,8 @@ export function getPrototype ({ isW3C, isChrome, isFirefox, isMobile, isSauce, i
          * only apply special commands when running tests using
          * Selenium Grid or Selenium Standalone server
          */
-        isSeleniumStandalone ? SeleniumProtocol : {}
+        isSeleniumStandalone ? SeleniumProtocol : {},
+        {} as Protocol
     )
 
     for (const [endpoint, methods] of Object.entries(ProtocolCommands)) {

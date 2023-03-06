@@ -1,6 +1,6 @@
-import { getElement } from '../../utils/getElementObject'
-import { ELEMENT_KEY } from '../../constants'
-import type { CustomStrategyFunction } from '../../types'
+import { getElement } from '../../utils/getElementObject.js'
+import { ELEMENT_KEY } from '../../constants.js'
+import type { CustomStrategyFunction } from '../../types.js'
 
 /**
  *
@@ -10,7 +10,7 @@ import type { CustomStrategyFunction } from '../../types'
     :example.js
     it('should fetch the project title', async () => {
         await browser.url('https://webdriver.io')
-        await browser.addLocatorStrategy('myStrat', (selector) => {
+        browser.addLocatorStrategy('myStrat', (selector) => {
             return document.querySelectorAll(selector)
         })
 
@@ -25,7 +25,7 @@ import type { CustomStrategyFunction } from '../../types'
  * @param {Any} strategyArguments
  * @return {Element}
  */
-export default async function custom$ (
+export async function custom$ (
     this: WebdriverIO.Browser,
     strategyName: string,
     ...strategyArguments: any[]

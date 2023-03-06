@@ -2,6 +2,7 @@
 @import url(docsearch.css);
 @import url(hero.css);
 @import url(buttons.css);
+@import url(codeblock.css);
 
 :root {
     --ifm-color-primary: #ea5906;
@@ -31,7 +32,7 @@
     --wdio-link-background-color: #eee0d7;
     --wdio-link-color: #000;
     --wdio-section-background-color: #fff;
-    --wdio-dark-section-background-color: #efefef;
+    --wdio-dark-section-background-color: #dfdfdf;
 }
 
 html[data-theme=dark] {
@@ -45,6 +46,18 @@ html[data-theme=dark] {
 @media (max-width: 996px) {
     :root {
         --wdio-spacing-vertical: 20px;
+    }
+
+    body .footer__links {
+        width: 100%;
+    }
+
+    body .footer__bottom {
+        width: 100%;
+    }
+
+    body .footer__bottom > div {
+        text-align: center;
     }
 }
 
@@ -98,6 +111,9 @@ html[data-theme=dark] {
     color: var(--wdio-link-color);
 }
 
+.footer__logo {
+    max-width: 125px;
+}
 .footer__links {
     width: 75%;
     float: right;

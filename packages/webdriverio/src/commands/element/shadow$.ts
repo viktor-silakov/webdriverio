@@ -1,4 +1,4 @@
-import { shadowFnFactory } from '../../scripts/shadowFnFactory'
+import { shadowFnFactory } from '../../scripts/shadowFnFactory.js'
 
 /**
  *
@@ -20,7 +20,7 @@ import { shadowFnFactory } from '../../scripts/shadowFnFactory'
  * @type utility
  *
  */
-export default async function shadowRoot (
+export async function shadow$ (
     this: WebdriverIO.Element,
     selector: string
 ) {

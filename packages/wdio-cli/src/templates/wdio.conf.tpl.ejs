@@ -1,46 +1,38 @@
-<%
-if(!answers.isUsingTypeScript) {
-    %>exports.config = {<%
-} else {
+<% if (answers.isUsingTypeScript) {
     %>import type { Options } from '@wdio/types'
 
 export const config: Options.Testrunner = {<%
+} else if (answers.esmSupport) {
+    %>export const config = {<%
+} else {
+    %>exports.config = {<%
 } %>
     //
     // ====================
     // Runner Configuration
     // ====================
-    //<%
-    if(answers.isUsingTypeScript){ %>
-    //
-    // =====================
-    // ts-node Configurations
-    // =====================
-    //
-    // You can write tests using TypeScript to get autocompletion and type safety.
-    // You will need typescript and ts-node installed as devDependencies.
-    // WebdriverIO will automatically detect if these dependencies are installed
-    // and will compile your config and tests for you.
-    // If you need to configure how ts-node runs please use the
-    // environment variables for ts-node or use wdio config's autoCompileOpts section.
-    //
-
-    autoCompileOpts: {
-        autoCompile: true,
-        // see https://github.com/TypeStrong/ts-node#cli-and-programmatic-options
-        // for all available options
-        tsNodeOpts: {
-            transpileOnly: true,
-            project: 'test/tsconfig.json'
+    // WebdriverIO supports running e2e tests as well as unit and component tests.
+    runner: <%
+    if (answers.runner === 'browser') {
+        if (answers.preset) {
+            %>['browser', {
+        preset: '<%- answers.preset %>'
+    }]<%
+        } else {
+            %>'browser'<%
         }
-        // tsconfig-paths is only used if "tsConfigPathsOpts" are provided, if you
-        // do please make sure "tsconfig-paths" is installed as dependency
-        // tsConfigPathsOpts: {
-        //     baseUrl: './'
-        // }
-    },<% }
-
-    if(answers.expEnvAccessKey){ %>
+    } else {
+        %>'local'<%
+    }
+    %>,<%
+    if (answers.isUsingTypeScript) { %>
+    autoCompileOpts: {
+        tsNodeOpts: {
+            project: '<%- answers.tsProject %>'
+        }
+    },
+    <% } %>
+    <% if(answers.expEnvAccessKey){ %>
     hostname: '<%- answers.expEnvHostname %>',
     <% if (answers.expEnvPort === '443'){%>protocol: 'https',
     <%} else if (answers.expEnvPort === '80'){%>protocol: 'http',
@@ -90,7 +82,7 @@ export const config: Options.Testrunner = {<%
     // Specify Test Files
     // ==================
     // Define which test specs should run. The pattern is relative to the directory
-    // from which `wdio` was called.
+    // of the configuration file being run.
     //
     // The specs are defined as an array of spec files (optionally using wildcards
     // that will be expanded). The test for each spec file will be run in a separate
@@ -102,7 +94,7 @@ export const config: Options.Testrunner = {<%
     // will be called from there.
     //
     specs: [
-        '<%- answers.specs %>'
+        <%- answers.specs ? `'${answers.specs}'` : '// ToDo: define location for spec files here' %>
     ],
     // Patterns to exclude.
     exclude: [
@@ -131,7 +123,7 @@ export const config: Options.Testrunner = {<%
     // https://saucelabs.com/platform/platform-configurator
     //
     capabilities: [{
-    <%if(answers.expEnvAccessKey){%> 'experitest:accessKey': '<%- answers.expEnvAccessKey %>',<%}%>
+    <% if (answers.expEnvAccessKey){%> 'experitest:accessKey': '<%- answers.expEnvAccessKey %>',<% } %>
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.

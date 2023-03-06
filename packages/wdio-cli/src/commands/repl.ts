@@ -1,11 +1,11 @@
 import pickBy from 'lodash.pickby'
 import { remote } from 'webdriverio'
-import { hasWdioSyncSupport } from '@wdio/utils'
-import { cmdArgs as runCmdArgs } from './run'
-import { getCapabilities } from '../utils'
-import { ReplCommandArguments } from '../types'
-import { CLI_EPILOGUE } from '../constants'
-import yargs from 'yargs'
+import type { Argv, Options } from 'yargs'
+
+import { cmdArgs as runCmdArgs } from './run.js'
+import { getCapabilities } from '../utils.js'
+import { CLI_EPILOGUE } from '../constants.js'
+import type { ReplCommandArguments } from '../types.js'
 
 const IGNORED_ARGS = [
     'bail', 'framework', 'reporters', 'suite', 'spec', 'exclude',
@@ -14,7 +14,7 @@ const IGNORED_ARGS = [
 
 export const command = 'repl <option> [capabilities]'
 export const desc = 'Run WebDriver session in command line'
-export const cmdArgs: { [k in keyof ReplCommandArguments]?: yargs.Options } = {
+export const cmdArgs: { [k in keyof ReplCommandArguments]?: Options } = {
     platformVersion: {
         alias: 'v',
         desc: 'Version of OS for mobile devices',
@@ -32,7 +32,7 @@ export const cmdArgs: { [k in keyof ReplCommandArguments]?: yargs.Options } = {
     }
 } as const
 
-export const builder = (yargs: yargs.Argv) => {
+export const builder = (yargs: Argv) => {
     return yargs
         .options(pickBy({ ...cmdArgs, ...runCmdArgs }, (_, key) => !IGNORED_ARGS.includes(key)))
         .example('$0 repl firefox --path /', 'Run repl locally')
@@ -47,17 +47,10 @@ export const builder = (yargs: yargs.Argv) => {
 }
 
 export const handler = async (argv: ReplCommandArguments) => {
-    const caps = getCapabilities(argv)
+    const caps = await getCapabilities(argv)
+    const client = await remote({ ...argv, ...caps })
 
-    /**
-     * runner option required to wrap commands within Fibers context
-     */
-    const execMode = hasWdioSyncSupport ? { runner: 'local' as const } : {}
-    const client = await remote({ ...argv, ...caps, ...execMode })
-
-    // @ts-ignore
     global.$ = client.$.bind(client)
-    // @ts-ignore
     global.$$ = client.$$.bind(client)
     global.browser = client
 

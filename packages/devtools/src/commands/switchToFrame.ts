@@ -1,10 +1,10 @@
-import type { Page } from 'puppeteer-core/lib/cjs/puppeteer/common/Page'
-import type { Frame } from 'puppeteer-core/lib/cjs/puppeteer/common/FrameManager'
+import type { Page } from 'puppeteer-core/lib/esm/puppeteer/api/Page.js'
+import type { Frame } from 'puppeteer-core/lib/esm/puppeteer/common/Frame.js'
 import type { ElementReference } from '@wdio/protocols'
 
-import { ELEMENT_KEY } from '../constants'
-import { getStaleElementError } from '../utils'
-import type DevToolsDriver from '../devtoolsdriver'
+import { ELEMENT_KEY } from '../constants.js'
+import { getStaleElementError } from '../utils.js'
+import type DevToolsDriver from '../devtoolsdriver.js'
 
 /**
  * The Switch To Frame command is used to select the current top-level browsing context
@@ -68,7 +68,7 @@ export default async function switchToFrame (
         /**
          * `page` has `frames` method while `frame` has `childFrames` method
          */
-        let getFrames = (page as unknown as Page).frames || page.childFrames
+        const getFrames = (page as unknown as Page).frames || page.childFrames
         const childFrames = await getFrames.apply(page)
         const childFrame = childFrames[id]
 

@@ -1,7 +1,7 @@
-import { enhanceElementsArray } from '../../utils'
-import { getElements } from '../../utils/getElementObject'
-import { ELEMENT_KEY } from '../../constants'
-import type { ElementArray, CustomStrategyFunction, CustomStrategyReference } from '../../types'
+import { enhanceElementsArray } from '../../utils/index.js'
+import { getElements } from '../../utils/getElementObject.js'
+import { ELEMENT_KEY } from '../../constants.js'
+import type { ElementArray, CustomStrategyFunction, CustomStrategyReference } from '../../types.js'
 
 /**
  *
@@ -26,7 +26,7 @@ import type { ElementArray, CustomStrategyFunction, CustomStrategyReference } fr
  * @param {Any} strategyArguments
  * @return {ElementArray}
  */
-export default async function custom$$ (
+export async function custom$$ (
     this: WebdriverIO.Browser,
     strategyName: string,
     ...strategyArguments: any[]

@@ -1,7 +1,7 @@
-import { findElement } from '../../utils'
-import { getElement } from '../../utils/getElementObject'
-import { ELEMENT_KEY } from '../../constants'
-import type { Selector } from '../../types'
+import { findElement } from '../../utils/index.js'
+import { getElement } from '../../utils/getElementObject.js'
+import { ELEMENT_KEY } from '../../constants.js'
+import type { Selector } from '../../types.js'
 import type { ElementReference } from '@wdio/protocols'
 
 /**
@@ -28,34 +28,7 @@ import type { ElementReference } from '@wdio/protocols'
  * :::
  *
  * <example>
-    :index.html
-    <ul id="menu">
-        <li><a href="/">Home</a></li>
-        <li><a href="/">Developer Guide</a></li>
-        <li><a href="/">API</a></li>
-        <li><a href="/">Contribute</a></li>
-    </ul>
     :$.js
-    it('should get text a menu link', async () => {
-        const text = await $('#menu');
-        console.log(await text.$$('li')[2].$('a').getText()); // outputs: "API"
-    });
-
-    it('should get text a menu link - JS Function', async () => {
-        const text = await $(function() { // Arrow function is not allowed here.
-            // this is Window https://developer.mozilla.org/en-US/docs/Web/API/Window
-            // TypeScript users may do something like this
-            // return (this as Window).document.querySelector('#menu')
-            return this.document.querySelector('#menu'); // Element
-        });
-        console.log(await text.$$('li')[2].$('a').getText()); // outputs: "API"
-    });
-
-    it('should allow to convert protocol result of an element into a WebdriverIO element', async () => {
-        const activeElement = await browser.getActiveElement();
-        console.log(await $(activeElement).getTagName()); // outputs active element
-    });
-
     it('should use Androids DataMatcher or ViewMatcher selector', async () => {
         const menuItem = await $({
             "name": "hasEntry",
@@ -75,13 +48,17 @@ import type { ElementReference } from '@wdio/protocols'
  * @alias $
  * @param {String|Function|Matcher} selector  selector, JS Function, or Matcher object to fetch a certain element
  * @return {Element}
+ * @example https://github.com/webdriverio/example-recipes/blob/59c122c809d44d343c231bde2af7e8456c8f086c/queryElements/example.html
+ * @example https://github.com/webdriverio/example-recipes/blob/59c122c809d44d343c231bde2af7e8456c8f086c/queryElements/singleElements.js#L9-L10
+ * @example https://github.com/webdriverio/example-recipes/blob/59c122c809d44d343c231bde2af7e8456c8f086c/queryElements/singleElements.js#L16-L25
+ * @example https://github.com/webdriverio/example-recipes/blob/59c122c809d44d343c231bde2af7e8456c8f086c/queryElements/singleElements.js#L42-L46
  * @type utility
  *
  */
-export default async function $ (
+export async function $ (
     this: WebdriverIO.Browser | WebdriverIO.Element,
     selector: Selector
-) {
+): Promise<WebdriverIO.Element> {
     /**
      * convert protocol result into WebdriverIO element
      * e.g. when element was fetched with `getActiveElement`
